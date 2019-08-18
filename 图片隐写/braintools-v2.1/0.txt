@@ -1,2 +1,0 @@
-bftools.exe decode braincopter doge.png --output --dogeout.png
-bftools.exe run --dogeout.png
