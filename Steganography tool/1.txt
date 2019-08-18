@@ -1,0 +1,77 @@
+ctf之隐写工具篇
+时间：2017-04-02 23:21:24      阅读：14117      评论：0      收藏：0      [点我收藏+]
+
+标签：htm   phi   down   恢复   round   decode   arch   end   常用   
+
+0x00 Stegdetect
+Stegdetect程序主要用于分析JPEG文件，可以检测到通过JSteg、JPHide、OutGuess、Invisible Secrets、F5、appendX和Camouflage等这些隐写工具隐藏的信息
+
+1，安装
+windows安装文件我没找到。我在kali安装Stegdetect比较简单
+apt-get install stegdetect
+OutGuess安装：https://github.com/crorvick/outguess.git
+./configure && make && make install
+Stegdetect通过统计测试来分析图像文件中是否包含隐藏内容。它运行静态测试以判断隐藏的内容是否存在。此外，它还会尝试识别隐藏内容是通过哪个隐写工具嵌入的。
+
+2，Stegdetect的主要选项如下：
+q – 仅显示可能包含隐藏内容的图像
+n – 启用检查JPEG文件头功能，以降低误报率。如果启用，所有带有批注区域的文件将被视为没有被嵌入信息。
+如果JPEG文件的JFIF标识符中的版本号不是1.1，则禁用OutGuess检测。
+s – 修改检测算法的敏感度，该值的默认值为1。检测结果的匹配度与检测算法的敏感度成正比，
+算法敏感度的值越大，检测出的可疑文件包含敏感信息的可能性越大。
+d – 打印带行号的调试信息。
+t – 设置要检测哪些隐写工具（默认检测jopi），可设置的选项如下：
+j – 检测图像中的信息是否是用jsteg嵌入的。
+o – 检测图像中的信息是否是用outguess嵌入的。
+p – 检测图像中的信息是否是用jphide嵌入的。
+i – 检测图像中的信息是否是用invisible secrets嵌入的。
+当然误报率还是有的
+
+0x01 outguess
+linux下载安装比较简单：
+http://download.csdn.net/detail/florak/5620983
+./configure && make && make install
+
+执行以下命令解密:
+outguess -r ‘/root/Desktop/angrybird.jpg’ -t 11.txt
+
+0x02 mp3stego
+mp3stego(http://www.petitcolas.net/steganography/mp3stego/)主要用于mp3隐写
+使用非常简单
+加密:encode -E hidden_text.txt -P pass svega.wav svega_stego.mp3
+解密：decode -X -P pass svega_stego.mp3
+
+0x03 binwalk,dd,foremost命令
+linux下binwalk命令常用于分析隐写文件，dd命令用于提取文件。
+分析：
+root@kali:~/Desktop# binwalk baozou_new.jpg
+
+DECIMAL       HEX           DESCRIPTION
+-------------------------------------------------------------------------------------------------------------------
+0             0x0           JPEG image data, JFIF standard  1.01
+4308          0x10D4        Zip encrypted archive data, at least v2.0 to extract, compressed size: 8890,  uncompressed size: 9990, name: "qr.png"  
+可以看出 0x10D4位置后是zip文件。
+提取文件：
+root@kali:~/Desktop# dd if=baozou_new.jpg of=2.zip bs=1 skip=4308
+9065+0 records in
+9065+0 records out
+9065 bytes (9.1 kB) copied, 0.0475933 s, 190 kB/s
+
+foremost命令同样可以达到效果：
+foremost -v -i baozou_new.jpg -o /root/Desktop/xx
+支持恢复如下格式：avi, bmp, dll, doc, exe, gif, htm, jar, jpg, mbd, mov, mpg, pdf, png, ppt, rar, rif, sdw, sx, sxc, sxi,
+sxw, vis, wav, wmv, xls, zip。
+
+0x04 F5-steganography
+git clone https://github.com/matthewgao/F5-steganography
+cd F5-steganography
+java Extract ../123456.jpg -p 123456
+后会生成output.txt文件，里面就有flag了
+
+0x05 steghide
+官网地址：http://steghide.sourceforge.net/documentation.php
+在文件中隐藏数据
+steghide –embed -cf /root/Desktop/1111.jpg -ef /root/Desktop/embeddate
+检查图片中隐藏的信息
+steghide info /root/Desktop/1111.jpg
+steghide extract -sf background.jpg
