@@ -1,0 +1,12 @@
+但是问题依旧存在，本次靶机要求三个MD5相同的文件，而fastcoll工具只能一次性生成两个文件，只有这两个文件的MD5值相同，所以这里我们需要借助一个工具tail.exe（windows下的tail命令，用于查看文件内容，并且可将指定长度内容输出到另一文件，下载链接放在文末）以及windows下的type命令
+
+本次过程在windows cmd.exe执行，具体生成过程如下：
+
+D:\fastcoll>fastcoll_v1.0.0.5.exe -o jlzj0 jlzj1      #-o参数代表随机生成两个相同MD5的文件
+D:\fastcoll>fastcoll_v1.0.0.5.exe -p jlzj1 -o jlzj00 jlzj01  #-p参数代表根据jlzj1文件随机生成两个相同MD5的文件，注意：生成的MD5与jlzj1不同
+D:\fastcoll>tail.exe -c 128 jlzj00 > a                #-c 128代表将jlzj00的最后128位写入文件a，这128位正是jlzj1与jlzj00的MD5不同的原因
+D:\fastcoll>tail.exe -c 128 jlzj01 > b                #同理
+D:\fastcoll>type jlzj0 a > jlzj10                    #这里表示将jlzj0和a文件的内容合并写入jlzj10
+D:\fastcoll>type jlzj0 b > jlzj11                    #同理写入jlzj11
+
+curl.exe --data-urlencode username@D:\fastcoll\jlzj00 --data-urlencode password@D:\fastcoll\jlzj01 --data-urlencode code@D:\fastcoll\jlzj10 --data-urlencode "remember=1&login=Login" http://10.1.13.37/d5fa314e8577e3a7b8534a014b4dcb221de823ad/index.php -i

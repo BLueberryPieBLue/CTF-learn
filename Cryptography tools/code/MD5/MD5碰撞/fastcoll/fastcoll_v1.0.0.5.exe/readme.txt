@@ -1,0 +1,1 @@
+把解压出来的fastcoll_v1.0.0.5.exe与test.rar放在同一目录，然后在“命令提示符”中输入：“fastcoll_v1.0.0.5.exe -i test.rar -p test.rar -o test.exe test2.exe”并回车，在同目录中会生成名为test.exe和test2.exe文件，我们用HashX校检他们的MD5值，可以发现是完全一样的，但是在HashX中查看两者“SHA-1”值的时候，结果竟然是不同的(SHA-1加密算法生成的结果也是独一无二的)!可见这是完全不同的两个文件，但是它们的MD5值竟然完全相同。
